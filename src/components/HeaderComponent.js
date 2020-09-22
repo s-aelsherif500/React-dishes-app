@@ -70,7 +70,7 @@ class Header extends Component {
             <div>
                 <Navbar sticky="top" dark expand="md">
                     <div className="container">
-                        <NavbarToggler onClick={this.toggleNav} />
+                        <NavbarToggler onClick={this.toggleNav} className="navbar-toggler-icon" />
                         <NavbarBrand className="mr-auto" href="/"><img src='assets/images/logo.png' height="30" width="41" alt='Ristorante Con Fusion' /></NavbarBrand>
                         <Collapse isOpen={this.state.isNavOpen} navbar>
                             <Nav navbar>
@@ -97,14 +97,18 @@ class Header extends Component {
                 </Navbar>
                 <Jumbotron>
                     <div className="container">
-                        <div className="row row-header">
-                            <div className="col-12 col-sm-6">
+                        <div class="row row-header">
+                            <div class="col-12 col-sm-6">
                                 <h1>Ristorante con Fusion</h1>
                                 <p>We take inspiration from the World's best cuisines, and create a unique fusion experience. Our lipsmacking creations will tickle your culinary senses!</p>
+                            </div>
+                            <div class="col-12 col-sm align-self-center">
+                                <img src="./assets/images/logo.png" alt ="logo" class="img-fluid"/>
                             </div>
                         </div>
                     </div>
                 </Jumbotron>
+
                 <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
                     <ModalHeader toggle={this.toggleModal}>Login</ModalHeader>
                     <ModalBody>

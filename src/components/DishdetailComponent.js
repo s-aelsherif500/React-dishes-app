@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { Card, CardImg, CardText, CardBody,
     CardTitle, Breadcrumb, BreadcrumbItem,
-    Button, Modal, ModalHeader, ModalBody, Row, Col, Label } from 'reactstrap';
+    Button, Modal, ModalHeader, ModalBody, Row, Col, Label, Jumbotron } from 'reactstrap';
 import { Control, LocalForm, Errors } from 'react-redux-form';
 import { Link } from 'react-router-dom';
-
+import { Loading } from './LoadingComponent';
+import { baseUrl } from '../shared/baseUrl';
+import { FadeTransform, Fade, Stagger } from 'react-animation-components';
 
 const required = (val) => val && val.length;
 const maxLength = (len) => (val) => !(val) || (val.length <= len);
@@ -25,7 +27,7 @@ class CommentForm extends Component {
       }
     handleSubmit(values) {
         this.toggleModal();
-        this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
+        this.props.postComment(this.props.dishId, values.rating, values.author, values.comment);
         //console.log('loook at this :-',this.props.addComment(this.props.dishId, values.rating, values.author, values.comment))
     }
     render(){
@@ -88,47 +90,78 @@ class CommentForm extends Component {
         )
     }
 }
-function RenderComments({comments, addComment, dishId}) {
+function RenderComments({comments, postComment, dishId}) {
         if (comments == null) {
             return (<div></div>)
         }
         const cmnts = comments.map(comment => {
             return (
-                <li key={comment.id}>
-                    <p>{comment.comment}</p>
-                    <p>-- {comment.author},
-                    &nbsp;
-                    {new Intl.DateTimeFormat('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: '2-digit'
-                        }).format(new Date(comment.date))}
-                    </p>
-                </li>
+                <Stagger in>
+                    <Fade in>
+                        <li key={comment.id}>
+                            <Jumbotron>
+                                <strong><p>{comment.comment}</p></strong>
+                                <p>-- {comment.author},
+                                &nbsp;
+                                {new Intl.DateTimeFormat('en-US', {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: '2-digit'
+                                    }).format(new Date(comment.date))}
+                                </p>
+                            </Jumbotron>
+                            <br />
+                        </li>
+                    </Fade>
+                </Stagger>
             )
         })
         return (
             <div className='col-12 m-1'>
                 <h4> Comments </h4>
+                <CommentForm dishId={dishId} postComment={postComment} />
                 <ul className='list-unstyled'>
                     {cmnts}
                 </ul>
-                <CommentForm dishId={dishId} addComment={addComment} />
             </div>
         )
     }
 
-function RenderDish({dish}) {
-        if (dish != null) {
+function RenderDish({dish,isLoading,errMess}) {
+    if (isLoading) {
+        return(
+            <div className="container">
+                <div className="row">            
+                    <Loading />
+                </div>
+            </div>
+        );
+    }
+    else if (errMess) {
+        return(
+            <div className="container">
+                <div className="row">            
+                    <h4>{errMess}</h4>
+                </div>
+            </div>
+        );
+    }
+    else if (dish != null){
             return (
                 <div className='col-12 m-1'>
-                    <Card>
-                        <CardImg width="100%" src={dish.image} alt={dish.name} />
-                        <CardBody>
-                            <CardTitle>{dish.name}</CardTitle>
-                            <CardText>{dish.description}</CardText>
-                        </CardBody>
-                    </Card>
+                    <FadeTransform
+                        in
+                        transformProps={{
+                            exitTransform: 'scale(0.5) translateY(-50%)'
+                        }}>
+                        <Card>
+                            <CardImg top src={baseUrl + dish.image} alt={dish.name} />
+                            <CardBody>
+                                <CardTitle>{dish.name}</CardTitle>
+                                <CardText>{dish.description}</CardText>
+                            </CardBody>
+                        </Card>
+                    </FadeTransform>
                 </div>
             )
         }
@@ -143,26 +176,16 @@ function RenderDish({dish}) {
         }
         return (
             <div className="container">
-            <div className="row">
-                <Breadcrumb>
-                    <BreadcrumbItem><Link to="/menu">Menu</Link></BreadcrumbItem>
-                    <BreadcrumbItem active>{props.dish.name}</BreadcrumbItem>
-                </Breadcrumb>
-                <div className="col-12">
-                    <h3>{props.dish.name}</h3>
-                    <hr />
-                </div>                
-            </div>
-            <div className="row">
-                <div className="col-12 col-md-5 m-1">
-                    <RenderDish dish={props.dish} />
+                <div className="row">
+                    <Breadcrumb>
+                        <BreadcrumbItem><Link to="/menu">Menu</Link></BreadcrumbItem>
+                        <BreadcrumbItem active>{props.dish.name}</BreadcrumbItem>
+                    </Breadcrumb>
+                    <div className="col-12">
+                        <h3>{props.dish.name}</h3>
+                        <hr />
+                    </div>                
                 </div>
-                <div className="col-12 col-md-5 m-1">
-                    <RenderComments comments={props.comments}
-                        addComment={props.addComment}
-                        dishId={props.dish.id} />
-                </div>
-            </div>
             </div>
         );
     }

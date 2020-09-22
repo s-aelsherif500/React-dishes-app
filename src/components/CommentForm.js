@@ -20,9 +20,7 @@ class SubmitComment extends Component {
         });
       }
     handleSubmit(values) {
-        this.toggleModal();
-        console.log('Current State is: ' + JSON.stringify(values).rating);
-        alert('Current State is: ' + JSON.stringify(values.rating));   
+        this.toggleModal(); 
         //event.preventDefault();
     }
     render(){

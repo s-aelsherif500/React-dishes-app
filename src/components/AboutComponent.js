@@ -1,16 +1,18 @@
 import React from 'react';
 import { Breadcrumb, BreadcrumbItem, Card, CardBody, CardHeader, Media } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import { Loading } from './LoadingComponent';
+import { baseUrl } from '../shared/baseUrl';
+import { Fade, Stagger } from 'react-animation-components';
 
 function About(props) {
 
     function RenderLeader({leader}){
-        let location =`${leader.image}`;
-        console.log(location);
+        let location =`${baseUrl + leader.image}`;
         return(
             <Media className="leader-card">
                 <Media left top>
-                    <img className='leader-image' src={location} />
+                    <img  alt ="leader" className='leader-image' src={location} />
                 </Media>
                 <Media body>
                     <Media heading>
@@ -24,13 +26,32 @@ function About(props) {
             </Media>          
         )
     }
-    const leaders = props.leaders.map((leader) => {
-        return (
-            <p>
-                <RenderLeader leader={leader}/>
-            </p>
-        );
-    });
+    const AllLeader = (props) => {      
+       if (props.props.leadersLoading) {
+            return(
+                    <Loading />
+            );
+        }
+        else if (props.props.leadersErrMess) {
+            console.log('This is an error',)
+            return(
+                    <h4 className="text-danger">{props.props.leadersErrMess}</h4>
+            );
+        } else{
+            const leaders = props.props.leaders.map((leader) => {
+                return (
+                    <Stagger in>
+                        <Fade in>
+                            <p>
+                                <RenderLeader leader={leader}/>
+                            </p>
+                        </Fade>
+                    </Stagger>
+                );
+            });
+            return(leaders)
+        }
+    }
 
     return(
         <div className="container">
@@ -88,7 +109,7 @@ function About(props) {
                 </div>
                 <div className="col-12">
                     <Media list>
-                        {leaders}
+                        <AllLeader props={props}/>
                     </Media>
                 </div>
             </div>
